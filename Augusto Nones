@@ -1,0 +1,32 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+// Convierte el texto a minúsculas
+string aMinuscula(string texto) {
+    transform(texto.begin(), texto.end(), texto.begin(), ::tolower);
+    return texto;
+}
+
+int main() {
+    string nombreArchivo = "archivo.txt";
+    string linea, buscar;
+    int totalCoincidencias = 0;
+
+    ifstream archivo(nombreArchivo);
+
+    if (!archivo.is_open()) {
+        cout << "Error: No se pudo abrir el archivo." << endl;
+        return 1;
+    }
+
+    cout << "Ingrese la palabra o letra que desea buscar: ";
+    getline(cin, buscar);
+
+    while (buscar.empty()) {
+        cout << "Entrada vacía. Intente nuevamente: ";
+        getline(cin, buscar);
+    }
