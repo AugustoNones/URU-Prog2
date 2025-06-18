@@ -1,0 +1,38 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+struct Producto {
+    int codigo;
+    char nombre[31];
+    float precio;
+    int stock;
+    char categoria[31];
+    bool activo;
+};
+
+const char archivoNombre[] = "productos.dat";
+
+void limpiarBuffer() {
+    cin.clear();
+    cin.ignore(10000, '\n');
+}
+
+long buscarProducto(int codigo) {
+    ifstream archivo(archivoNombre, ios::binary);
+    if (!archivo) return -1;
+
+    Producto p;
+    long pos = 0;
+    while (archivo.read((char*)&p, sizeof(Producto))) {
+        if (p.codigo == codigo) {
+            archivo.close();
+            return pos;
+        }
+        pos++;
+    }
+    archivo.close();
+    return -1;
+}
