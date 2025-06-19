@@ -36,3 +36,37 @@ long buscarProducto(int codigo) {
     archivo.close();
     return -1;
 }
+
+void agregarProducto() {
+    Producto p;
+    cout << "Codigo: ";
+    cin >> p.codigo;
+    limpiarBuffer();
+
+    if (buscarProducto(p.codigo) != -1) {
+        cout << "Ese codigo ya existe.\n";
+        return;
+    }
+
+    cout << "Nombre: ";
+    cin.getline(p.nombre, 31);
+
+    cout << "Precio: ";
+    cin >> p.precio;
+
+    cout << "Stock: ";
+    cin >> p.stock;
+    limpiarBuffer();
+
+    cout << "Categoria: ";
+    cin.getline(p.categoria, 31);
+
+    p.activo = true;
+
+    fstream archivo(archivoNombre, ios::in | ios::out | ios::binary);
+    if (!archivo) {
+        // Si no existe el archivo, lo crea
+        archivo.open(archivoNombre, ios::out | ios::binary);
+        archivo.close();
+        archivo.open(archivoNombre, ios::in | ios::out | ios::binary);
+    }
