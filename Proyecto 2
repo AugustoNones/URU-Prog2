@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-
 using namespace std;
+
+const char archivoNombre[] = "productos.dat";
 
 struct Producto {
     int codigo;
@@ -12,8 +13,6 @@ struct Producto {
     char categoria[31];
     bool activo;
 };
-
-const char archivoNombre[] = "productos.dat";
 
 void limpiarBuffer() {
     cin.clear();
@@ -35,6 +34,13 @@ long buscarProducto(int codigo) {
     }
     archivo.close();
     return -1;
+}
+
+void mostrarProducto(Producto p) {
+    if (!p.activo) return;
+    cout << "Codigo: " << p.codigo << "\nNombre: " << p.nombre
+         << "\nPrecio: " << p.precio << "\nStock: " << p.stock
+         << "\nCategoría: " << p.categoria << "\n\n";
 }
 
 void agregarProducto() {
@@ -65,8 +71,62 @@ void agregarProducto() {
 
     fstream archivo(archivoNombre, ios::in | ios::out | ios::binary);
     if (!archivo) {
-        // Si no existe el archivo, lo crea
         archivo.open(archivoNombre, ios::out | ios::binary);
         archivo.close();
         archivo.open(archivoNombre, ios::in | ios::out | ios::binary);
+    }
+
+    archivo.seekp((p.codigo - 1) * sizeof(Producto));
+    archivo.write((char*)&p, sizeof(Producto));
+    archivo.close();
+
+    cout << "Producto agregado.\n";
+}
+
+void mostrarActivos() {
+    ifstream archivo(archivoNombre, ios::binary);
+    if (!archivo) {
+        cout << "No hay productos.\n";
+        return;
+    }
+
+    Producto p;
+    bool hay = false;
+    while (archivo.read((char*)&p, sizeof(Producto))) {
+        if (p.activo) {
+            mostrarProducto(p);
+            hay = true;
+        }
+    }
+
+    if (!hay) cout << "No hay productos activos.\n";
+    archivo.close();
+}
+
+void modificarProducto() {
+    int codigo;
+    cout << "Ingrese el código del producto a modificar: ";
+    cin >> codigo;
+    limpiarBuffer();
+
+    long pos = buscarProducto(codigo);
+    if (pos == -1) {
+        cout << "Producto no encontrado.\n";
+        return;
+    }
+
+    fstream archivo(archivoNombre, ios::in | ios::out | ios::binary);
+    if (!archivo) {
+        cout << "Error al abrir el archivo.\n";
+        return;
+    }
+
+    Producto p;
+    archivo.seekg(pos * sizeof(Producto));
+    archivo.read((char*)&p, sizeof(Producto));
+
+    if (!p.activo) {
+        cout << "El producto está inactivo y no puede modificarse.\n";
+        archivo.close();
+        return;
     }
